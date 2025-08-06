@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vizitka | Flip Card</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    :root {
+      --gold-bg: linear-gradient(135deg, #ffd700, #1c1c1c);
+      --black-bg: #1c1c1c;
+      --gold-color: #ffd700;
+      --black-color: #1c1c1c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--gold-bg);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: background 0.4s ease;
+      color: #1c1c1c;
+    }
+
+    body.black-mode {
+      background: var(--black-bg);
+      color: var(--gold-color);
+    }
+
+    .top-controls {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    select,
+    button {
+      padding: 6px 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    select {
+      background: white;
+      color: black;
+    }
+
+    body.black-mode select {
+      background: #333;
+      color: var(--gold-color);
+    }
+
+    button {
+      background: var(--gold-color);
+      color: var(--black-color);
+    }
+
+    body.black-mode button {
+      background: #444;
+      color: var(--gold-color);
+    }
+
+    .flip-card {
+      background-color: transparent;
+      width: 320px;
+      height: 400px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: #fff8dc;
+    }
+
+    body.black-mode .flip-card-inner {
+      background: var(--black-bg);
+      color: var(--gold-color);
+      box-shadow: 0 10px 30px #ffd700aa;
+    }
+
+    .flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+    }
+
+    .flip-card-front {
+      background: #fff8dc;
+      color: var(--black-color);
+    }
+
+    body.black-mode .flip-card-front {
+      background: var(--black-bg);
+      color: var(--gold-color);
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+      background: var(--black-bg);
+      color: var(--gold-color);
+    }
+
+    body.black-mode .flip-card-back {
+      background: #fff8dc;
+      color: var(--black-color);
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .contacts {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .contacts a {
+      text-decoration: none;
+      background: var(--black-color);
+      color: var(--gold-color);
+      padding: 10px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    body.black-mode .contacts a {
+      background: var(--gold-color);
+      color: var(--black-color);
+    }
+
+    .contacts a:hover {
+      transform: scale(1.2);
+    }
+
+    .clock {
+      margin-top: 30px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff8dc;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 10px;
+      user-select: none;
+      min-width: 300px;
+      text-align: center;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.black-mode .clock {
+      background: rgba(255, 215, 0, 0.3);
+      color: var(--black-color);
+    }
+
+    .bio {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      text-align: center;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-controls">
+    <select id="languageSelect" aria-label="Til tanlash">
+      <option value="uz">UZ</option>
+      <option value="en">EN</option>
+      <option value="ru">RU</option>
+    </select>
+    <button id="modeToggleBtn" aria-label="Rejimni o‘zgartirish">Gold / Black rejim</button>
+  </div>
+
+  <div class="flip-card" id="flipCard" tabindex="0" aria-label="Vizitka karta">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <div class="title" data-text="name">Azam Turdiyev</div>
+        <div class="subtitle" data-text="job">Frontend Dasturchi</div>
+        <div class="contacts">
+          <a href="https://t.me/turdiyevazam" target="_blank" title="Telegram" rel="noopener noreferrer">💬</a>
+          <a href="https://instagram.com/turdiyev__2303" target="_blank" title="Instagram" rel="noopener noreferrer">📷</a>
+          <a href="tel:+998888823111" title="Telefon">📞</a>
+          <a href="mailto:turdiyevazam40@gmail.com" title="Email">📧</a>
+        </div>
+      </div>
+      <div class="flip-card-back">
+        <div class="title" data-text="aboutTitle">Men haqimda</div>
+        <div class="bio" data-text="bio">
+          Email: turdiyevazam40@gmail.com
+          Manzil: Samarqand, O‘zbekiston
+          Qisqacha bio: 💻 Frontend dasturchi
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clock" id="clock" aria-live="polite" aria-atomic="true">--:--:--</div>
+
+  <script>
+    const languageSelect = document.getElementById('languageSelect');
+    const flipCard = document.getElementById('flipCard');
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    const body = document.body;
+
+    const texts = {
+      uz: {
+        name: 'Azam Turdiyev',
+        job: 'Frontend Dasturchi',
+        aboutTitle: 'Men haqimda',
+        bio: `Email: turdiyevazam40@gmail.com\nManzil: Samarqand, O‘zbekiston\nQisqacha bio: 💻 Frontend dasturchi`,
+        locale: 'uz-UZ'
+      },
+      en: {
+        name: 'Azam Turdiyev',
+        job: 'Frontend Developer',
+        aboutTitle: 'About Me',
+        bio: `Email: turdiyevazam40@gmail.com\nLocation: Samarkand, Uzbekistan\nShort bio: 💻 Frontend developer`,
+        locale: 'en-US'
+      },
+      ru: {
+        name: 'Азам Турдиев',
+        job: 'Frontend разработчик',
+        aboutTitle: 'Обо мне',
+        bio: `Почта: turdiyevazam40@gmail.com\nГород: Самарканд, Узбекистан\nКратко: 💻 Frontend разработчик`,
+        locale: 'ru-RU'
+      }
+    };
+
+    // Tilni set qilish
+    function setLanguage(lang) {
+      localStorage.setItem('language', lang);
+      const content = texts[lang];
+      document.querySelectorAll('[data-text]').forEach(el => {
+        const key = el.getAttribute('data-text');
+        // \n ni <br> emas, pre-line orqali ko'rsatamiz
+        el.textContent = content[key];
+      });
+      updateClock();
+    }
+
+    // Soatni yangilash
+    function updateClock() {
+      const clock = document.getElementById('clock');
+      const lang = localStorage.getItem('language') || 'uz';
+      const now = new Date();
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      const formatted = now.toLocaleString(texts[lang].locale, options);
+      clock.textContent = formatted;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Flip karta uchun toggle
+    flipCard.addEventListener('click', () => {
+      flipCard.classList.toggle('flipped');
+    });
+
+    // Tilni tiklash
+    const savedLang = localStorage.getItem('language') || 'uz';
+    languageSelect.value = savedLang;
+    setLanguage(savedLang);
+
+    languageSelect.addEventListener('change', e => {
+      setLanguage(e.target.value);
+    });
+
+    // Rejim toggle: Gold / Black
+    function toggleMode() {
+      if (body.classList.contains('black-mode')) {
+        body.classList.remove('black-mode');
+        localStorage.setItem('mode', 'gold');
+        modeToggleBtn.textContent = 'Gold / Black rejim';
+      } else {
+        body.classList.add('black-mode');
+        localStorage.setItem('mode', 'black');
+        modeToggleBtn.textContent = 'Gold / Black rejim';
+      }
+    }
+
+    modeToggleBtn.addEventListener('click', toggleMode);
+
+    // Tiklash rejimni yuklashda
+    const savedMode = localStorage.getItem('mode') || 'gold';
+    if (savedMode === 'black') {
+      body.classList.add('black-mode');
+    } else {
+      body.classList.remove('black-mode');
+    }
+  </script>
+</body>
+
+</html>
